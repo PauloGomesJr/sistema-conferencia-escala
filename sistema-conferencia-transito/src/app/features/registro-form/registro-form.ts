@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { RegistroServico } from '../../models/registro-servico.model';
 
 // Importe os serviços que criamos/vamos criar
 // Remova o '.service' e deixe apenas o nome do arquivo conforme está na pasta
@@ -46,9 +47,10 @@ export class RegistroFormComponent {
 
   salvar() {
     if (this.registroForm.valid) {
+      // 1. Recupera os valores do formulário (O 'val' que estava faltando!)
       const val = this.registroForm.value;
       
-      // 1. Cálculos Automáticos usando o Service
+      // 2. Refaz os cálculos que haviam sido apagados
       const horasTotais = this.calculoService.calcularTotalHoras(
         val.data!, val.horaInicio!, val.horaFim!
       );
@@ -56,21 +58,24 @@ export class RegistroFormComponent {
         val.data!, val.horaInicio!, val.horaFim!
       );
 
-      // 2. Montagem do Objeto Final
-      const novoRegistro = {
-        ...val,
-        id: crypto.randomUUID(), // Gera um ID único simples
+      // 3. Monta o objeto com a tipagem forte
+      const novoRegistro: RegistroServico = {
+        id: crypto.randomUUID(),
+        data: val.data!,
+        horaInicio: val.horaInicio!,
+        horaFim: val.horaFim!,
+        codigoServico: val.codigoServico!,
+        descricao: val.descricao!,
+        observacao: val.observacao || '',
         parceiros: val.parceirosRaw ? val.parceirosRaw.split(',').map(n => n.trim()) : [],
         totalHoras: horasTotais,
         adicionalNoturno: horasNoturnas
       };
 
-      // 3. Persistência no LocalStorage (via Service)
+      // 4. Salva e limpa
       this.registroService.salvar(novoRegistro);
 
       console.log('Salvo com sucesso!', novoRegistro);
-      
-      // 4. Limpar o formulário para o próximo uso
       this.registroForm.reset({ data: new Date() });
       alert('Serviço registrado com sucesso!');
     }

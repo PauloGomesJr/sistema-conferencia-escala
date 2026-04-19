@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="resumo-financeiro">
+    <div class="card-stats">
+      <small>Total de Horas</small>
+      <p>{{ totalHorasMes | number:'1.1-2' }}h</p>
+    </div>
+    <div class="card-stats">
+      <small>Adic. Noturno</small>
+      <p>{{ totalAdicionalNoturno | number:'1.1-2' }}h</p>
+    </div>
+  </div>
+
+  <div class="lista-items">
+    @for (s of servicos; track s.id) {
+      <mat-card class="item-card">
+        <mat-card-header>
+          <mat-card-title>{{ s.codigoServico }}</mat-card-title>
+          <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ s.descricao }}</p>
+          @if (s.parceiros && s.parceiros.length > 0) {
+            <small>🤝 {{ s.parceiros.join(', ') }}</small>
+          }
+        </mat-card-content>
+      </mat-card>
+    } @empty {
+      <p class="msg-vazio">Ainda não há serviços registrados.</p>
+    }
+  </div>
+</div>

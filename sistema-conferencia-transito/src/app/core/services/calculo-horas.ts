@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+const FATOR_HORA_REDUZIDA = 1.142857;
+
 @Injectable({ providedIn: 'root' })
 export class CalculoHorasService {
 
@@ -17,25 +19,27 @@ export class CalculoHorasService {
 
   // Calcula Adicional Noturno (22:00 às 05:00)
   calcularAdicionalNoturno(data: Date, inicio: string, fim: string): number {
-    const start = this.gerarData(data, inicio);
-    let end = this.gerarData(data, fim);
+  const start = this.gerarData(data, inicio);
+  let end = this.gerarData(data, fim);
 
-    if (end < start) end.setDate(end.getDate() + 1);
+  if (end < start) end.setDate(end.getDate() + 1);
 
-    let minutosNoturnos = 0;
-    let temp = new Date(start);
+  let minutosNoturnosReais = 0;
+  let temp = new Date(start);
 
-    // Percorre minuto a minuto (abordagem simples e precisa)
-    while (temp < end) {
-      const hora = temp.getHours();
-      if (hora >= 22 || hora < 5) {
-        minutosNoturnos++;
-      }
-      temp.setMinutes(temp.getMinutes() + 1);
+  while (temp < end) {
+    const hora = temp.getHours();
+    // Faixa noturna: 22h às 05h
+    if (hora >= 22 || hora < 5) {
+      minutosNoturnosReais++;
     }
-
-    return minutosNoturnos / 60;
+    temp.setMinutes(temp.getMinutes() + 1);
   }
+
+  // Aqui aplicamos a redução contábil
+  const horasNoturnasReais = minutosNoturnosReais / 60;
+  return horasNoturnasReais * FATOR_HORA_REDUZIDA;
+}
 
   private gerarData(base: Date, hora: string): Date {
     const [h, m] = hora.split(':').map(Number);
