@@ -1,0 +1,48 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.content {
+  flex: 1;
+  padding-top: 64px;    /* Espaço para a barra de cima */
+  padding-bottom: 56px; /* Espaço para a barra de baixo */
+  overflow-y: auto;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  background-color: white;
+  border-top: 1px solid #ddd;
+  justify-content: space-around;
+  align-items: center;
+
+  button {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    
+    mat-icon { margin-bottom: -4px; }
+    span { font-size: 12px; display: block; }
+  }
+
+  .active-link {
+    color: #3f51b5; /* Cor de destaque quando a rota está ativa */
+  }
+}

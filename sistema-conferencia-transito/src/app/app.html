@@ -1,1 +1,20 @@
-<router-outlet></router-outlet>
+<div class="app-container">
+  <mat-toolbar color="primary" class="header">
+    <span>Escala Trânsito</span>
+  </mat-toolbar>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="bottom-nav">
+    <button mat-button routerLink="/registro" routerLinkActive="active-link">
+      <mat-icon>add_circle</mat-icon>
+      <span>Novo</span>
+    </button>
+    <button mat-button routerLink="/lista" routerLinkActive="active-link">
+      <mat-icon>history</mat-icon>
+      <span>Histórico</span>
+    </button>
+  </nav>
+</div>
