@@ -47,16 +47,68 @@
   }
 }
 
+/* =========================================
+   ESTILOS DE IMPRESSÃO (CUPOM FISCAL)
+   ========================================= */
 @media print {
-  /* Esconde a barra azul de cima e a navegação de baixo */
-  .header, .bottom-nav {
-    display: none !important;
+  /* Reduz as margens padrão do navegador na folha A4/PDF */
+  @page {
+    margin: 5mm;
   }
 
-  /* Remove o espaço que as barras ocupavam para o texto colar no topo da folha */
-  .content {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    overflow: visible !important;
+  /* Esconde tudo que não deve sair no papel */
+  .no-print { display: none !important; }
+
+  /* Ajusta o container para parecer uma bobina de 80mm */
+  .container {
+    width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    font-family: 'Courier New', Courier, monospace !important; 
+    color: black !important;
+  }
+
+  /* Cabeçalho mais compacto */
+  .resumo-financeiro {
+    flex-direction: column !important;
+    gap: 2px !important; /* Reduzido de 4px */
+    margin-bottom: 8px !important; /* Reduzido de 16px */
+    border-bottom: 1px dashed black !important;
+    padding-bottom: 4px !important;
+  }
+
+  .card-stats {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    text-align: left !important;
+    display: flex;
+    justify-content: space-between;
+
+    /* AQUI: alterado font-weight para bold no small (Total de Horas / Adic. Noturno) */
+    small { font-size: 12px !important; font-weight: bold !important; display: inline !important; }
+    p { font-size: 12px !important; font-weight: bold !important; display: inline !important; margin-left: 8px !important; }
+  }
+
+  /* Transforma os cards dos serviços, removendo os desperdícios de espaço */
+  .item-card {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px dashed #999 !important;
+    margin-bottom: 4px !important; /* Reduzido de 8px */
+    padding: 0 0 4px 0 !important; /* Reduzido de 8px */
+    background: transparent !important;
+
+    mat-card-header { padding: 0 !important; }
+    mat-card-content { padding: 0 !important; margin-top: 2px !important; }
+    
+    mat-card-title { font-size: 14px !important; font-weight: bold !important; line-height: 1.1 !important; margin-bottom: 2px !important; }
+    mat-card-subtitle { font-size: 12px !important; color: black !important; margin-top: 0 !important; line-height: 1.1 !important; margin-bottom: 4px !important; }
+    
+    /* Descrição mais junta e compacta */
+    p { font-size: 11px !important; margin: 2px 0 !important; color: black !important; line-height: 1.1 !important; }
+    small { font-size: 10px !important; color: black !important; font-style: normal !important; line-height: 1.1 !important; margin-top: 2px !important; }
   }
 }
