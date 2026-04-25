@@ -46,3 +46,17 @@
     color: #3f51b5; /* Cor de destaque quando a rota está ativa */
   }
 }
+
+@media print {
+  /* Esconde a barra azul de cima e a navegação de baixo */
+  .header, .bottom-nav {
+    display: none !important;
+  }
+
+  /* Remove o espaço que as barras ocupavam para o texto colar no topo da folha */
+  .content {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+  }
+}

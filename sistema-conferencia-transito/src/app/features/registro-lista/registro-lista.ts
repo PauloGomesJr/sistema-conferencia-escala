@@ -1,13 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button'; 
+import { MatIconModule } from '@angular/material/icon';
 import { RegistroService } from '../../core/services/registro';
 import { RegistroServico } from '../../models/registro-servico.model'; // Importação
 
 @Component({
   selector: 'app-registro-lista',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
   templateUrl: './registro-lista.html',
   styleUrl: './registro-lista.scss'
 })
@@ -28,5 +30,9 @@ export class RegistroListaComponent implements OnInit {
     
     this.totalHorasMes = this.servicos.reduce((acc, curr) => acc + (curr.totalHoras || 0), 0);
     this.totalAdicionalNoturno = this.servicos.reduce((acc, curr) => acc + (curr.adicionalNoturno || 0), 0);
+  }
+
+  imprimirCupom() {
+    window.print(); // Chama a tela de impressão nativa do celular/computador
   }
 }

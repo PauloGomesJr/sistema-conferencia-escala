@@ -66,3 +66,70 @@
   margin-top: 40px;
   color: #999;
 }
+
+.header-acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  h2 { margin: 0; font-size: 18px; color: #333; }
+}
+
+/* =========================================
+   ESTILOS DE IMPRESSÃO (CUPOM FISCAL)
+   ========================================= */
+@media print {
+  /* Esconde tudo que não deve sair no papel */
+  .no-print { display: none !important; }
+
+  /* Ajusta o container para parecer uma bobina de 80mm */
+  .container {
+    width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    font-family: 'Courier New', Courier, monospace !important; /* Fonte de maquininha */
+    color: black !important;
+  }
+
+  /* Transforma os cards de resumo em linhas de texto normais */
+  .resumo-financeiro {
+    flex-direction: column !important;
+    gap: 4px !important;
+    margin-bottom: 16px !important;
+    border-bottom: 2px dashed black !important;
+    padding-bottom: 8px !important;
+  }
+
+  .card-stats {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    text-align: left !important;
+    display: flex;
+    justify-content: space-between;
+
+    small { font-size: 12px !important; font-weight: normal !important; display: inline !important; }
+    p { font-size: 12px !important; font-weight: bold !important; display: inline !important; margin-left: 8px !important; }
+  }
+
+  /* Transforma os cards dos serviços em blocos de texto simples */
+  .item-card {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px dashed #666 !important;
+    margin-bottom: 8px !important;
+    padding: 0 0 8px 0 !important;
+    background: transparent !important;
+
+    mat-card-header { padding: 0 !important; }
+    mat-card-content { padding: 0 !important; margin-top: 4px !important; }
+    
+    mat-card-title { font-size: 14px !important; font-weight: bold !important; }
+    mat-card-subtitle { font-size: 12px !important; color: black !important; margin-top: 2px !important; }
+    p { font-size: 11px !important; margin: 4px 0 !important; color: black !important; }
+    small { font-size: 10px !important; color: black !important; font-style: normal !important; }
+  }
+}
