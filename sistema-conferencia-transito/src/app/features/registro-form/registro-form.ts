@@ -45,7 +45,7 @@ export class RegistroFormComponent {
     observacao: ['']
   });
 
-  salvar() {
+  async salvar() {
     if (this.registroForm.valid) {
       // 1. Recupera os valores do formulário (O 'val' que estava faltando!)
       const val = this.registroForm.value;
@@ -73,7 +73,7 @@ export class RegistroFormComponent {
       };
 
       // 4. Salva e limpa
-      this.registroService.salvar(novoRegistro);
+     await this.registroService.salvar(novoRegistro);
 
       console.log('Salvo com sucesso!', novoRegistro);
       this.registroForm.reset({ data: new Date() });
