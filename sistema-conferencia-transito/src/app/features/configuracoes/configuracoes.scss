@@ -1,0 +1,31 @@
+.container-config {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  h2 {
+    color: #3f51b5;
+    margin-bottom: 8px;
+  }
+
+  .aviso {
+    color: #666;
+    background-color: #fce4ec;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    border-left: 4px solid #e91e63;
+    font-size: 14px;
+  }
+
+  .acoes-backup {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    button {
+      padding: 24px 0; /* Botões grandes, fáceis de clicar na rua */
+      font-size: 16px;
+    }
+  }
+}

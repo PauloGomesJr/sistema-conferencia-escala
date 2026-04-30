@@ -1,0 +1,29 @@
+<div class="container-config">
+  <h2>Segurança e Backup</h2>
+  <p class="aviso">Seus dados são salvos apenas neste dispositivo. Faça backups regulares para não perder seu histórico caso troque de celular.</p>
+
+  <div class="acoes-backup">
+    
+    <!-- Botão de Exportar -->
+    <button mat-raised-button color="primary" (click)="exportarBackup()">
+      <mat-icon>cloud_download</mat-icon>
+      Exportar Histórico (Backup)
+    </button>
+
+    <br>
+
+    <!-- Botão de Importar (Esconde o input feio padrão do HTML) -->
+    <button mat-raised-button color="accent" (click)="fileInput.click()">
+      <mat-icon>cloud_upload</mat-icon>
+      Importar / Restaurar
+    </button>
+    <input 
+      #fileInput 
+      type="file" 
+      accept=".json" 
+      style="display: none" 
+      (change)="importarBackup($event)"
+    >
+
+  </div>
+</div>

@@ -30,10 +30,10 @@ export class RegistroListaComponent implements OnInit {
   // Adicionamos o "async" aqui
   async carregarDados() {
     try {
-      console.log('1. Lista pediu os dados para o banco...');
+      //console.log('1. Lista pediu os dados para o banco...');
       
       const dadosBrutos = await this.registroService.listar();
-      console.log('2. O banco respondeu com:', dadosBrutos);
+     // console.log('2. O banco respondeu com:', dadosBrutos);
 
       this.servicos = dadosBrutos.sort((a, b) => {
         const dataA = new Date(a.data).getTime();
@@ -44,7 +44,7 @@ export class RegistroListaComponent implements OnInit {
       this.totalHorasMes = this.servicos.reduce((acc, curr) => acc + (curr.totalHoras || 0), 0);
       this.totalAdicionalNoturno = this.servicos.reduce((acc, curr) => acc + (curr.adicionalNoturno || 0), 0);
       
-      console.log('3. Tela pronta para renderizar os cards!');
+      //console.log('3. Tela pronta para renderizar os cards!');
       this.cdr.detectChanges();
     } catch (erro) {
       console.error('ERRO GRAVE ao listar dados:', erro);
