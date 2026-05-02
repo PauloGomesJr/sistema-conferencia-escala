@@ -1,15 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+// NOVO: Importando FormArray
+import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { RegistroServico } from '../../models/registro-servico.model';
 
-// Importe os serviços que criamos/vamos criar
-// Remova o '.service' e deixe apenas o nome do arquivo conforme está na pasta
+// NOVO: Importações para os botões de + e - no HTML
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { RegistroServico } from '../../models/registro-servico.model';
 import { CalculoHorasService } from '../../core/services/calculo-horas';
 import { RegistroService } from '../../core/services/registro';
 
@@ -23,7 +26,9 @@ import { RegistroService } from '../../core/services/registro';
     MatFormFieldModule, 
     MatInputModule, 
     MatButtonModule, 
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatIconModule,     // <-- NOVO
+    MatTooltipModule   // <-- NOVO
   ],
   templateUrl: './registro-form.html',
   styleUrl: './registro-form.scss'
@@ -31,7 +36,6 @@ import { RegistroService } from '../../core/services/registro';
 export class RegistroFormComponent {
   private fb = inject(FormBuilder);
   
-  // Injetando os serviços de lógica e persistência
   private calculoService = inject(CalculoHorasService);
   private registroService = inject(RegistroService);
 
@@ -40,17 +44,34 @@ export class RegistroFormComponent {
     horaInicio: ['', Validators.required],
     horaFim: ['', Validators.required],
     codigoServico: ['', Validators.required],
-    parceirosRaw: [''],
+    // NOVO: Trocamos o parceirosRaw por um FormArray
+    parceiros: this.fb.array([
+      this.fb.control('') // Inicia com o primeiro campo vazio
+    ]),
     descricao: ['', Validators.required],
     observacao: ['']
   });
 
+  // === MÉTODOS DE CONTROLE DO FORMARRAY ===
+  get parceiros(): FormArray {
+    return this.registroForm.get('parceiros') as FormArray;
+  }
+
+  adicionarParceiro() {
+    this.parceiros.push(this.fb.control(''));
+  }
+
+  removerParceiro(index: number) {
+    if (this.parceiros.length > 1) {
+      this.parceiros.removeAt(index);
+    }
+  }
+  // ========================================
+
   async salvar() {
     if (this.registroForm.valid) {
-      // 1. Recupera os valores do formulário (O 'val' que estava faltando!)
       const val = this.registroForm.value;
       
-      // 2. Refaz os cálculos que haviam sido apagados
       const horasTotais = this.calculoService.calcularTotalHoras(
         val.data!, val.horaInicio!, val.horaFim!
       );
@@ -58,7 +79,11 @@ export class RegistroFormComponent {
         val.data!, val.horaInicio!, val.horaFim!
       );
 
-      // 3. Monta o objeto com a tipagem forte
+      // NOVO: Trata o array de parceiros removendo espaços vazios
+      const listaParceiros = (val.parceiros as string[])
+        .map(p => p ? p.trim() : '')
+        .filter(p => p !== ''); // Remove campos que ficaram em branco
+
       const novoRegistro: RegistroServico = {
         id: crypto.randomUUID(),
         data: val.data!,
@@ -67,16 +92,20 @@ export class RegistroFormComponent {
         codigoServico: val.codigoServico!,
         descricao: val.descricao!,
         observacao: val.observacao || '',
-        parceiros: val.parceirosRaw ? val.parceirosRaw.split(',').map(n => n.trim()) : [],
+        parceiros: listaParceiros,
         totalHoras: horasTotais,
         adicionalNoturno: horasNoturnas
       };
 
-      // 4. Salva e limpa
-     await this.registroService.salvar(novoRegistro);
+      await this.registroService.salvar(novoRegistro);
 
       console.log('Salvo com sucesso!', novoRegistro);
+      
+      // Limpa o formulário e reseta a lista de parceiros para ter apenas 1 novamente
       this.registroForm.reset({ data: new Date() });
+      this.parceiros.clear();
+      this.adicionarParceiro();
+
       alert('Serviço registrado com sucesso!');
     }
   }
