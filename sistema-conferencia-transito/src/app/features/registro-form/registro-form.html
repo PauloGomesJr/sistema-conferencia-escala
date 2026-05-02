@@ -1,5 +1,14 @@
 <div class="container">
-  <h2>📝 Novo Registro de Serviço</h2>
+  <!-- === NOVO: CABEÇALHO COM BOTÃO DE REAPROVEITAR === -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <h2 style="margin: 0;">📝 Novo Registro de Serviço</h2>
+    
+    <button mat-stroked-button color="primary" type="button" (click)="reaproveitarUltimaEscala()">
+      <mat-icon>content_copy</mat-icon>
+      Reaproveitar Anterior
+    </button>
+  </div>
+  <!-- ================================================== -->
 
   <form [formGroup]="registroForm" (ngSubmit)="salvar()">
     

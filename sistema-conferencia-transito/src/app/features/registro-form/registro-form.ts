@@ -74,7 +74,7 @@ export class RegistroFormComponent {
     'Atuar no ordenamento de trânsito.(informar evento)',
     'Controlar a entrada e saída de veículos em bloqueio viário (informar evento)',
     'Blitz',
-    'Realizar o ordenamento do trânsito e de pedestre na saída de escolares (Escola)',
+    'Atuar no ordenamento do trânsito e de pedestres na saída de escolares (Escola)',
     'Fiscalizar o estacionamento e impedir retenção de veículos na via (informar)',
     'Fiscalização do estacionamento rotativo de veículos',
     'Fiscalização por videomonitoramento'
@@ -84,7 +84,7 @@ export class RegistroFormComponent {
     // Pega o texto selecionado no menu e injeta dentro do campo 'descricao'
     this.registroForm.patchValue({ descricao: modeloSelecionado });
   }
-  
+
   async salvar() {
     if (this.registroForm.valid) {
       const val = this.registroForm.value;
@@ -126,4 +126,46 @@ export class RegistroFormComponent {
       alert('Serviço registrado com sucesso!');
     }
   }
+
+  // === NOVO: REAPROVEITAR ÚLTIMA ESCALA ===
+  async reaproveitarUltimaEscala() {
+    try {
+      // 1. Busca todos os registros salvos
+      const todosRegistros = await this.registroService.listar();
+      
+      if (todosRegistros.length === 0) {
+        alert('Nenhuma escala anterior encontrada para reaproveitar.');
+        return;
+      }
+
+      // 2. Pega o último registro da lista (o mais recente adicionado)
+      const ultimo = todosRegistros[todosRegistros.length - 1];
+
+      // 3. Preenche os campos simples do formulário (mantendo a data atual)
+      this.registroForm.patchValue({
+        horaInicio: ultimo.horaInicio,
+        horaFim: ultimo.horaFim,
+        codigoServico: ultimo.codigoServico,
+        descricao: ultimo.descricao,
+        observacao: ultimo.observacao
+      });
+
+      // 4. Limpa os parceiros atuais e preenche com os parceiros do último serviço
+      this.parceiros.clear();
+      
+      if (ultimo.parceiros && ultimo.parceiros.length > 0) {
+        ultimo.parceiros.forEach((parceiro: string) => {
+          this.parceiros.push(this.fb.control(parceiro));
+        });
+      } else {
+        // Se o anterior não tinha parceiro, deixa um campo vazio por padrão
+        this.parceiros.push(this.fb.control('')); 
+      }
+
+    } catch (error) {
+      console.error('Erro ao buscar última escala:', error);
+      alert('Erro ao tentar recuperar os dados da escala anterior.');
+    }
+  }
+
 }
