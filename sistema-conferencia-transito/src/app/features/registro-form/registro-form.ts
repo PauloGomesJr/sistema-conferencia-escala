@@ -1,4 +1,6 @@
-import { Component, inject } from '@angular/core';
+
+import { ActivatedRoute } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 // NOVO: Importando FormArray
 import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
@@ -41,6 +43,43 @@ export class RegistroFormComponent {
   private calculoService = inject(CalculoHorasService);
   private registroService = inject(RegistroService);
 
+  private route = inject(ActivatedRoute); // NOVO
+  
+  idEdicao: string | null = null; // Guarda o ID se estivermos editando
+
+  ngOnInit() {
+    // Fica de olho na URL para ver se chegou um ID
+    this.route.paramMap.subscribe(async (params) => {
+      const id = params.get('id');
+      if (id) {
+        this.idEdicao = id;
+        await this.carregarParaEdicao(id);
+      }
+    });
+  }
+  async carregarParaEdicao(id: string) {
+    const todos = await this.registroService.listar();
+    const registro = todos.find(r => r.id === id);
+
+    if (registro) {
+      this.registroForm.patchValue({
+        data: new Date(registro.data), // Converte para o calendário entender
+        horaInicio: registro.horaInicio,
+        horaFim: registro.horaFim,
+        codigoServico: registro.codigoServico,
+        descricao: registro.descricao,
+        observacao: registro.observacao
+      });
+
+      this.parceiros.clear();
+      if (registro.parceiros && registro.parceiros.length > 0) {
+        registro.parceiros.forEach(p => this.parceiros.push(this.fb.control(p)));
+      } else {
+        this.parceiros.push(this.fb.control(''));
+      }
+    }
+  }
+
   registroForm = this.fb.group({
     data: [new Date(), Validators.required],
     horaInicio: ['', Validators.required],
@@ -71,11 +110,11 @@ export class RegistroFormComponent {
   // ========================================
   // === MODELOS DE DESCRIÇÃO ===
   modelosDescricao = [
-    'Atuar no ordenamento de trânsito.(informar evento)',
     'Controlar a entrada e saída de veículos em bloqueio viário (informar evento)',
     'Blitz',
-    'Atuar no ordenamento do trânsito e de pedestres na saída de escolares (Escola)',
-    'Fiscalizar o estacionamento e impedir retenção de veículos na via (informar)',
+    'Ordenamento do trânsito e de pedestres na saída de escolares (Escola)',
+    'Ordenamento do trânsito no evento.(informar evento)',
+    'Fiscalizar os estacionamentos e impedir retenção de veículos na via',
     'Fiscalização do estacionamento rotativo de veículos',
     'Fiscalização por videomonitoramento'
   ];
@@ -102,7 +141,7 @@ export class RegistroFormComponent {
         .filter(p => p !== ''); // Remove campos que ficaram em branco
 
       const novoRegistro: RegistroServico = {
-        id: crypto.randomUUID(),
+        id: this.idEdicao ? this.idEdicao : crypto.randomUUID(),
         data: val.data!,
         horaInicio: val.horaInicio!,
         horaFim: val.horaFim!,
@@ -122,9 +161,10 @@ export class RegistroFormComponent {
       this.registroForm.reset({ data: new Date() });
       this.parceiros.clear();
       this.adicionarParceiro();
-
+      this.idEdicao = null; 
       alert('Serviço registrado com sucesso!');
     }
+
   }
 
   // === NOVO: REAPROVEITAR ÚLTIMA ESCALA ===

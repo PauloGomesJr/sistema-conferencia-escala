@@ -21,10 +21,19 @@
   <div class="lista-items">
     @for (s of servicos; track s.id) {
       <mat-card class="item-card">
-        <mat-card-header>
-          <mat-card-title>{{ s.codigoServico }}</mat-card-title>
-          <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
+        <!-- Ajustamos o header para usar flexbox e separar o título do botão -->
+        <mat-card-header style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <mat-card-title>{{ s.codigoServico }}</mat-card-title>
+            <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
+          </div>
+          
+          <!-- NOVO: Botão de Edição -->
+          <button mat-icon-button color="primary" (click)="editarServico(s.id!)">
+           <mat-icon>edit</mat-icon>
+        </button>
         </mat-card-header>
+        
         <mat-card-content>
           <p>{{ s.descricao }}</p>
           @if (s.parceiros && s.parceiros.length > 0) {
@@ -34,6 +43,6 @@
       </mat-card>
     } @empty {
       <p class="msg-vazio">Ainda não há serviços registrados.</p>
-    }
+    } 
   </div>
 </div>
