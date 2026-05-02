@@ -1,5 +1,5 @@
 
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, inject, OnInit } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 // NOVO: Importando FormArray
@@ -37,7 +37,9 @@ import { RegistroService } from '../../core/services/registro';
   templateUrl: './registro-form.html',
   styleUrl: './registro-form.scss'
 })
-export class RegistroFormComponent {
+export class RegistroFormComponent implements OnInit {
+  
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   
   private calculoService = inject(CalculoHorasService);
@@ -58,25 +60,50 @@ export class RegistroFormComponent {
     });
   }
   async carregarParaEdicao(id: string) {
-    const todos = await this.registroService.listar();
-    const registro = todos.find(r => r.id === id);
+    try {
+      const todos = await this.registroService.listar();
+      const registro = todos.find(r => r.id === id);
 
-    if (registro) {
-      this.registroForm.patchValue({
-        data: new Date(registro.data), // Converte para o calendário entender
-        horaInicio: registro.horaInicio,
-        horaFim: registro.horaFim,
-        codigoServico: registro.codigoServico,
-        descricao: registro.descricao,
-        observacao: registro.observacao
-      });
+      if (registro) {
+        // 1. Preenche os campos simples
+        this.registroForm.patchValue({
+          data: new Date(registro.data),
+          horaInicio: registro.horaInicio,
+          horaFim: registro.horaFim,
+          codigoServico: registro.codigoServico,
+          descricao: registro.descricao,
+          observacao: registro.observacao
+        });
 
-      this.parceiros.clear();
-      if (registro.parceiros && registro.parceiros.length > 0) {
-        registro.parceiros.forEach(p => this.parceiros.push(this.fb.control(p)));
-      } else {
-        this.parceiros.push(this.fb.control(''));
+        // 2. Limpa os campos de parceiros vazios que o Angular cria por padrão
+        this.parceiros.clear();
+
+        // 3. Monta a lista de parceiros garantindo compatibilidade com registros antigos
+        let parceirosParaCarregar: string[] = [];
+
+        if (registro.parceiros && Array.isArray(registro.parceiros) && registro.parceiros.length > 0) {
+          // Se for um registro novo (já em formato de lista)
+          parceirosParaCarregar = registro.parceiros;
+        } else if ((registro as any).parceirosRaw) {
+          // Se for um registro muito antigo (salvo com vírgulas)
+          parceirosParaCarregar = (registro as any).parceirosRaw.split(',').map((p: string) => p.trim());
+        }
+
+        // 4. Injeta os parceiros recuperados no formulário
+        if (parceirosParaCarregar.length > 0) {
+          parceirosParaCarregar.forEach(parceiro => {
+            if (parceiro) {
+              this.parceiros.push(this.fb.control(parceiro));
+            }
+          });
+        } else {
+          // Se realmente não tiver parceiro nenhum, deixa 1 campo em branco para ele digitar
+          this.parceiros.push(this.fb.control(''));
+        }
       }
+    } catch (error) {
+      console.error('Erro ao carregar edição:', error);
+      alert('Não foi possível carregar os dados deste serviço.');
     }
   }
 
@@ -157,12 +184,31 @@ export class RegistroFormComponent {
 
       console.log('Salvo com sucesso!', novoRegistro);
       
-      // Limpa o formulário e reseta a lista de parceiros para ter apenas 1 novamente
-      this.registroForm.reset({ data: new Date() });
-      this.parceiros.clear();
-      this.adicionarParceiro();
-      this.idEdicao = null; 
-      alert('Serviço registrado com sucesso!');
+      // === NOVO: FLUXO DE NAVEGAÇÃO E LIMPEZA ===
+      if (this.idEdicao) {
+        // Se era EDIÇÃO: Avisa e manda o usuário de volta para a lista
+        alert('Serviço atualizado com sucesso!');
+        this.idEdicao = null;
+        
+        // Substitua '/' pela rota da sua lista, se for diferente (ex: '/lista' ou '/historico')
+        this.router.navigate(['/']); 
+      } else {
+        // Se era um NOVO registro: Avisa, limpa o formulário e fica na página
+        alert('Serviço registrado com sucesso!');
+        
+        // 1. Reseta os valores
+        this.registroForm.reset({ data: new Date() });
+        this.parceiros.clear();
+        this.adicionarParceiro();
+
+        // 2. Remove o "vermelho" forçando a limpeza de erros do Angular Material
+        Object.keys(this.registroForm.controls).forEach(key => {
+          const control = this.registroForm.get(key);
+          control?.setErrors(null);
+          control?.markAsUntouched();
+          control?.markAsPristine();
+        });
+      }
     }
 
   }

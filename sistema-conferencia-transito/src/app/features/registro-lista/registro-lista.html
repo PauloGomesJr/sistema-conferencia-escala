@@ -19,22 +19,22 @@
   </div>
 
   <div class="lista-items">
-    @for (s of servicos; track s.id) {
-      <mat-card class="item-card">
-        <!-- Ajustamos o header para usar flexbox e separar o título do botão -->
-        <mat-card-header style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <mat-card-title>{{ s.codigoServico }}</mat-card-title>
-            <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
-          </div>
-          
-          <!-- NOVO: Botão de Edição -->
-          <button mat-icon-button color="primary" (click)="editarServico(s.id!)">
-           <mat-icon>edit</mat-icon>
+   @for (s of servicos; track s.id) {
+      <!-- Adicionamos position: relative ao card para segurar o botão -->
+      <mat-card class="item-card" style="position: relative;">
+        
+        <!-- NOVO: Botão flutuando no canto superior direito -->
+        <button mat-icon-button color="primary" (click)="editarServico(s.id!)" style="position: absolute; top: 8px; right: 8px; z-index: 1;">
+          <mat-icon>edit</mat-icon>
         </button>
+
+        <!-- Header limpo, usando o padrão nativo do Angular Material -->
+        <mat-card-header>
+          <mat-card-title>{{ s.codigoServico }}</mat-card-title>
+          <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
         </mat-card-header>
         
-        <mat-card-content>
+        <mat-card-content style="margin-top: 8px;">
           <p>{{ s.descricao }}</p>
           @if (s.parceiros && s.parceiros.length > 0) {
             <small>🤝 {{ s.parceiros.join(', ') }}</small>
@@ -43,6 +43,6 @@
       </mat-card>
     } @empty {
       <p class="msg-vazio">Ainda não há serviços registrados.</p>
-    } 
+    }
   </div>
 </div>
