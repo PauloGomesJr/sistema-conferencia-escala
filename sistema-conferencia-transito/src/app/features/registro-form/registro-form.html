@@ -77,9 +77,11 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Descrição do Serviço</mat-label>
-      <textarea matInput formControlName="descricao" rows="3"></textarea>
-   <!--   <mat-hint>O texto selecionado aparecerá aqui e pode ser editado.</mat-hint> -->
+      <mat-label>Data do Serviço</mat-label>
+      <!-- NOVO: [max]="dataMaxima" -->
+      <input matInput [matDatepicker]="picker" formControlName="data" [max]="dataMaxima">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
     <!-- ==================================== -->
 

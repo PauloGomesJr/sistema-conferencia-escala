@@ -41,13 +41,14 @@ export class RegistroFormComponent implements OnInit {
   
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  
   private calculoService = inject(CalculoHorasService);
   private registroService = inject(RegistroService);
-
   private route = inject(ActivatedRoute); // NOVO
   
   idEdicao: string | null = null; // Guarda o ID se estivermos editando
+
+  // NOVO: linha para bloquear datas futuras no calendário
+  dataMaxima = new Date();
 
   ngOnInit() {
     // Fica de olho na URL para ver se chegou um ID
@@ -186,13 +187,13 @@ export class RegistroFormComponent implements OnInit {
       
       // === NOVO: FLUXO DE NAVEGAÇÃO E LIMPEZA ===
       if (this.idEdicao) {
-        // Se era EDIÇÃO: Avisa e manda o usuário de volta para a lista
         alert('Serviço atualizado com sucesso!');
         this.idEdicao = null;
         
-        // Substitua '/' pela rota da sua lista, se for diferente (ex: '/lista' ou '/historico')
-        this.router.navigate(['/']); 
-      } else {
+        // CORREÇÃO: Troque a palavra 'lista' abaixo pela rota real do seu histórico
+        // Exemplo: se no navegador fica localhost:4200/historico, coloque '/historico'
+        this.router.navigate(['/lista']); 
+      }else {
         // Se era um NOVO registro: Avisa, limpa o formulário e fica na página
         alert('Serviço registrado com sucesso!');
         
