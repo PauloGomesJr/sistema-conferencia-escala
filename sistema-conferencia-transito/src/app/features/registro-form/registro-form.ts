@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { MatSelectModule } from '@angular/material/select';
 // NOVO: Importando FormArray
 import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -28,7 +29,8 @@ import { RegistroService } from '../../core/services/registro';
     MatButtonModule, 
     MatDatepickerModule,
     MatIconModule,     // <-- NOVO
-    MatTooltipModule   // <-- NOVO
+    MatTooltipModule,   // <-- NOVO
+    MatSelectModule
   ],
   templateUrl: './registro-form.html',
   styleUrl: './registro-form.scss'
@@ -67,7 +69,22 @@ export class RegistroFormComponent {
     }
   }
   // ========================================
+  // === MODELOS DE DESCRIÇÃO ===
+  modelosDescricao = [
+    'Atuar no ordenamento de trânsito.(informar evento)',
+    'Controlar a entrada e saída de veículos em bloqueio viário (informar evento)',
+    'Blitz',
+    'Realizar o ordenamento do trânsito e de pedestre na saída de escolares (Escola)',
+    'Fiscalizar o estacionamento e impedir retenção de veículos na via (informar)',
+    'Fiscalização do estacionamento rotativo de veículos',
+    'Fiscalização por videomonitoramento'
+  ];
 
+  preencherDescricao(modeloSelecionado: string) {
+    // Pega o texto selecionado no menu e injeta dentro do campo 'descricao'
+    this.registroForm.patchValue({ descricao: modeloSelecionado });
+  }
+  
   async salvar() {
     if (this.registroForm.valid) {
       const val = this.registroForm.value;
