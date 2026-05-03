@@ -12,6 +12,11 @@ export class AuthService {
   // 'currentUser$' é um observável que fica vigiando se tem alguém logado
   currentUser$ = user(this.auth);
 
+  constructor() {
+    // Força o Firebase a enviar os e-mails e exibir mensagens em Português do Brasil
+    this.auth.languageCode = 'pt-BR'; 
+  }
+
   async login(email: string, senha: string): Promise<void> {
     try {
       await signInWithEmailAndPassword(this.auth, email, senha);
