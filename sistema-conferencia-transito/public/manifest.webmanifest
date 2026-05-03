@@ -1,6 +1,6 @@
 {
-  "name": "sistema-conferencia-transito",
-  "short_name": "sistema-conferencia-transito",
+  "name": "Bom Serviço",
+  "short_name": "Bom Serviço",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
