@@ -1,20 +1,9 @@
-<div class="container">
-  <!-- === NOVO: CABEÇALHO COM BOTÃO DE REAPROVEITAR === -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-    <h2 style="margin: 0;">📝 Novo Registro de Serviço</h2>
-    
-    <button mat-stroked-button color="primary" type="button" (click)="reaproveitarUltimaEscala()">
-      <mat-icon>content_copy</mat-icon>
-      Reaproveitar Anterior
-    </button>
-  </div>
-  <!-- ================================================== -->
-
-  <form [formGroup]="registroForm" (ngSubmit)="salvar()">
+<form [formGroup]="registroForm" (ngSubmit)="salvar()">
     
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Data do Serviço</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="data">
+      <!-- CORREÇÃO: [max]="dataMaxima" no lugar correto -->
+      <input matInput [matDatepicker]="picker" formControlName="data" [max]="dataMaxima">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
@@ -36,7 +25,7 @@
       <input matInput formControlName="codigoServico" placeholder="Ex: MT02B">
     </mat-form-field>
 
-    <!-- === NOVO: SEÇÃO DE PARCEIROS === -->
+    <!-- === SEÇÃO DE PARCEIROS === -->
     <div formArrayName="parceiros" class="secao-parceiros">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
         <span style="font-weight: 500; color: #555;">Parceiros de Trabalho</span>
@@ -45,16 +34,13 @@
         </button>
       </div>
 
-      <!-- O Angular vai repetir esse bloco para cada parceiro no array -->
       @for (parceiroControl of parceiros.controls; track $index) {
         <div style="display: flex; gap: 8px; align-items: baseline;">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Parceiro {{ $index + 1 }}</mat-label>
-            <!-- Aqui ligamos o input diretamente ao índice do array -->
             <input matInput [formControlName]="$index" placeholder="Ex: Agente Silva">
           </mat-form-field>
           
-          <!-- Botão de remover (só aparece se tiver mais de 1 parceiro) -->
           @if (parceiros.length > 1) {
             <button mat-icon-button color="warn" type="button" (click)="removerParceiro($index)">
               <mat-icon>remove_circle_outline</mat-icon>
@@ -65,23 +51,21 @@
     </div>
     <!-- ================================ -->
 
-    <!-- === NOVO: MENU RÁPIDO E DESCRIÇÃO === -->
+    <!-- === MENU RÁPIDO === -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Modelos Rápidos (Opcional)</mat-label>
-      <!-- O (selectionChange) dispara a função enviando a frase escolhida -->
       <mat-select (selectionChange)="preencherDescricao($event.value)" placeholder="Selecione um modelo...">
         @for (modelo of modelosDescricao; track modelo) {
           <mat-option [value]="modelo">{{ modelo }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
-
+    
+    <!-- CORREÇÃO: Restaurada a área da Descrição que havia sumido! -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Data do Serviço</mat-label>
-      <!-- NOVO: [max]="dataMaxima" -->
-      <input matInput [matDatepicker]="picker" formControlName="data" [max]="dataMaxima">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
+      <mat-label>Descrição do Serviço</mat-label>
+      <textarea matInput formControlName="descricao" rows="3"></textarea>
+      <mat-hint>O texto selecionado aparecerá aqui e poderá ser editado.</mat-hint>
     </mat-form-field>
     <!-- ==================================== -->
 
@@ -94,4 +78,3 @@
       SALVAR SERVIÇO
     </button>
   </form>
-</div>
