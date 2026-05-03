@@ -1,0 +1,36 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header style="margin-bottom: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%;">
+      <mat-card-title style="font-size: 24px; color: #3f51b5; font-weight: bold;">Bom Serviço</mat-card-title>
+      <mat-card-subtitle style="font-size: 14px;">Recuperação de Senha</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Alertas de Sucesso ou Erro -->
+      @if (mensagem) {
+        <div [ngClass]="erro ? 'erro-alerta' : 'sucesso-alerta'" style="margin-bottom: 16px; padding: 10px; border-radius: 4px; text-align: center;" [style.backgroundColor]="erro ? '#ffebee' : '#e8f5e9'" [style.color]="erro ? '#c62828' : '#2e7d32'">
+          {{ mensagem }}
+        </div>
+      }
+
+      <p style="text-align: center; color: #666; margin-bottom: 24px;">
+        Digite seu e-mail corporativo abaixo para receber um link de redefinição.
+      </p>
+
+      <form [formGroup]="recuperarForm" (ngSubmit)="enviarLink()" class="login-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail corporativo</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="agente@exemplo.com">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="recuperarForm.invalid || carregando">
+          {{ carregando ? 'Enviando...' : 'Enviar Link de Recuperação' }}
+        </button>
+
+        <button mat-button type="button" routerLink="/login" style="margin-top: 8px;">
+          Voltar para o Login
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

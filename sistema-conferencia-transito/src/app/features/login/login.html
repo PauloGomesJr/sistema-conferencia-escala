@@ -7,9 +7,11 @@
 
     <mat-card-content>
       <!-- Mostra mensagem de erro caso erre a senha -->
-      <div class="erro-alerta" *ngIf="mensagemErro">
-        {{ mensagemErro }}
-      </div>
+      @if (mensagemErro) {
+        <div class="erro-alerta">
+          {{ mensagemErro }}
+        </div>
+      }
 
       <form [formGroup]="loginForm" (ngSubmit)="entrar()" class="login-form">
         <mat-form-field appearance="outline">
@@ -25,6 +27,11 @@
         <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || carregando">
           {{ carregando ? 'Autenticando...' : 'Entrar' }}
         </button>
+        <div style="text-align: center; margin-top: 16px;">
+          <a routerLink="/recuperar-senha" style="color: #3f51b5; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;">
+            Esqueci minha senha
+          </a>
+        </div>
       </form>
     </mat-card-content>
   </mat-card>

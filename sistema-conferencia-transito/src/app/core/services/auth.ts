@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, signOut, user, sendPasswordResetEmail } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -26,5 +26,14 @@ export class AuthService {
   async logout(): Promise<void> {
     await signOut(this.auth);
     this.router.navigate(['/login']);
+  }
+
+  async recuperarSenha(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: any) {
+      console.error('Erro ao recuperar senha', error);
+      throw new Error('Não foi possível enviar o e-mail. Verifique se o endereço está correto e cadastrado.');
+    }
   }
 }

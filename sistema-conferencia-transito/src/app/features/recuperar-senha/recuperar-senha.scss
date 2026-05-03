@@ -1,0 +1,56 @@
+/* Centraliza o formulário na tela ocupando a altura total */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f6f8; /* Fundo levemente acinzentado para destacar o card */
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Define o tamanho e o espaçamento interno do cartão */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px 16px;
+  border-radius: 8px;
+}
+
+/* Organiza os campos do formulário com espaçamento uniforme */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* Garante que os inputs ocupem 100% do espaço do cartão */
+mat-form-field {
+  width: 100%;
+}
+
+/* Estilos para as caixas de alerta (Erro e Sucesso) */
+.erro-alerta {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid #ffcdd2;
+}
+
+.sucesso-alerta {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid #c8e6c9;
+}

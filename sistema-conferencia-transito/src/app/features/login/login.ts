@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { Router, RouterModule } from '@angular/router'; // <-- NOVO AQUI
 
 // Importação ajustada para o novo nome de arquivo
 import { AuthService } from '../../core/services/auth';
@@ -14,7 +15,8 @@ import { AuthService } from '../../core/services/auth';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, 
-    MatFormFieldModule, MatInputModule, MatButtonModule
+    MatFormFieldModule, MatInputModule, MatButtonModule,
+    RouterModule
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss'
