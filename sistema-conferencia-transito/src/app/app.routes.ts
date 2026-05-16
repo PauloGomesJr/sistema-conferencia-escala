@@ -10,10 +10,9 @@ import { RecuperarSenhaComponent } from './features/recuperar-senha/recuperar-se
 import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' }, 
-  { path: 'login', component: LoginComponent }, 
+  { path: '', redirectTo: 'registro', pathMatch: 'full' },
   
-  // === NOVO: Rota pública para quem esqueceu a senha (sem authGuard) ===
+  { path: 'login', component: LoginComponent }, 
   { path: 'recuperar-senha', component: RecuperarSenhaComponent },
 
   // Rotas Privadas (protegidas pelo authGuard)

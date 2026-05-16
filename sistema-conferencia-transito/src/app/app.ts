@@ -18,5 +18,5 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('sistema-conferencia-transito');
+  protected readonly title = signal('Bom Serviço');
 }
