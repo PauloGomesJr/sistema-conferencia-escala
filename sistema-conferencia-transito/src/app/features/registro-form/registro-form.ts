@@ -67,7 +67,6 @@ export class RegistroFormComponent implements OnInit {
     });
   }
 
-  // === MÉTODOS DE CONTROLE DO FORMARRAY ===
   get parceiros(): FormArray {
     return this.registroForm.get('parceiros') as FormArray;
   }
@@ -82,38 +81,39 @@ export class RegistroFormComponent implements OnInit {
     }
   }
 
-  // === CARREGAMENTO PARA EDIÇÃO (CORRIGIDO) ===
+  // === CARREGAMENTO PARA EDIÇÃO (CORREÇÃO DEFINITIVA) ===
   async carregarParaEdicao(id: string) {
     try {
       const todos = await this.registroService.listar();
       const registro = todos.find(r => r.id === id);
 
       if (registro) {
-        // 1. Limpa os parceiros atuais PRIMEIRO, antes de injetar qualquer dado
-        this.parceiros.clear();
-
-        // 2. Extrai a lista de parceiros do banco de forma segura
+        // 1. Extrai a lista de parceiros do banco com segurança
         let parceirosParaCarregar: string[] = [];
 
         if (registro.parceiros && Array.isArray(registro.parceiros) && registro.parceiros.length > 0) {
           parceirosParaCarregar = registro.parceiros;
-        } else if ((registro as any).parceirosRaw) {
-          parceirosParaCarregar = (registro as any).parceirosRaw.split(',').map((p: string) => p.trim());
+        } else if (typeof registro.parceiros === 'string') {
+          parceirosParaCarregar = (registro.parceiros as string).split(',').map(p => p.trim());
         }
 
-        // 3. Monta as caixinhas e insere os nomes no FormArray
-        if (parceirosParaCarregar.length > 0) {
-          parceirosParaCarregar.forEach(parceiro => {
-            if (parceiro) {
-              this.parceiros.push(this.fb.control(parceiro));
-            }
-          });
-        } else {
-          // Mantém pelo menos um campo vazio se não havia ninguém
+        // Garante que se vier vazio, tenha pelo menos um campo em branco
+        if (parceirosParaCarregar.length === 0) {
+          parceirosParaCarregar = ['']; 
+        }
+
+        // 2. Ajusta a quantidade exata de caixinhas na tela
+        while (this.parceiros.length < parceirosParaCarregar.length) {
           this.parceiros.push(this.fb.control(''));
         }
+        while (this.parceiros.length > parceirosParaCarregar.length) {
+          this.parceiros.removeAt(this.parceiros.length - 1);
+        }
 
-        // 4. Injeta o resto dos dados simples no formulário
+        // 3. INJETA os valores na marra. Isso obriga a tela e a memória a ficarem idênticas!
+        this.parceiros.patchValue(parceirosParaCarregar);
+
+        // 4. Injeta os demais dados
         this.registroForm.patchValue({
           data: new Date(registro.data),
           horaInicio: registro.horaInicio,
@@ -129,7 +129,7 @@ export class RegistroFormComponent implements OnInit {
     }
   }
 
-  // === REAPROVEITAR ÚLTIMA ESCALA (CORRIGIDO) ===
+  // === REAPROVEITAR ÚLTIMA ESCALA (CORREÇÃO DEFINITIVA) ===
   async reaproveitarUltimaEscala() {
     try {
       const todosRegistros = await this.registroService.listar();
@@ -141,19 +141,24 @@ export class RegistroFormComponent implements OnInit {
 
       const ultimo = todosRegistros[todosRegistros.length - 1];
 
-      // 1. Limpa os parceiros atuais PRIMEIRO
-      this.parceiros.clear();
-      
-      // 2. Monta as caixinhas e insere os nomes do último serviço
+      // 1. Extrai os parceiros
+      let parceirosParaCarregar: string[] = [''];
       if (ultimo.parceiros && Array.isArray(ultimo.parceiros) && ultimo.parceiros.length > 0) {
-        ultimo.parceiros.forEach((parceiro: string) => {
-          this.parceiros.push(this.fb.control(parceiro));
-        });
-      } else {
-        this.parceiros.push(this.fb.control('')); 
+        parceirosParaCarregar = ultimo.parceiros;
       }
 
-      // 3. Injeta o resto dos dados (mantendo a data original de hoje que está no formulário)
+      // 2. Ajusta a quantidade exata de caixinhas
+      while (this.parceiros.length < parceirosParaCarregar.length) {
+        this.parceiros.push(this.fb.control(''));
+      }
+      while (this.parceiros.length > parceirosParaCarregar.length) {
+        this.parceiros.removeAt(this.parceiros.length - 1);
+      }
+
+      // 3. Sincroniza visual e memória
+      this.parceiros.patchValue(parceirosParaCarregar);
+
+      // 4. Injeta os demais dados
       this.registroForm.patchValue({
         horaInicio: ultimo.horaInicio,
         horaFim: ultimo.horaFim,
@@ -169,10 +174,11 @@ export class RegistroFormComponent implements OnInit {
   }
 
   modelosDescricao = [
-    'Controlar a entrada e saída de veículos em bloqueio viário (informar evento)',
+    'Controlar a entrada e saída de veículos em bloqueio viário de evento',
+    'Ordenamento do trânsito e de pedestres na saída de escolares',
     'Blitz',
-    'Ordenamento do trânsito e de pedestres na saída de escolares (Escola)',
-    'Ordenamento do trânsito no evento.(informar evento)',
+    'Realizar o patrulhamento viário por meio de motocicleta',
+    'Ordenamento do trânsito em evento',
     'Fiscalizar os estacionamentos e impedir retenção de veículos na via',
     'Fiscalização do estacionamento rotativo de veículos',
     'Fiscalização por videomonitoramento'
@@ -222,8 +228,12 @@ export class RegistroFormComponent implements OnInit {
         alert('Serviço registrado com sucesso!');
         
         this.registroForm.reset({ data: new Date() });
-        this.parceiros.clear();
-        this.adicionarParceiro();
+        
+        // CORREÇÃO NO RESET DO SALVAMENTO: Limpa com segurança e deixa 1 vazia
+        while (this.parceiros.length !== 0) {
+          this.parceiros.removeAt(0);
+        }
+        this.parceiros.push(this.fb.control(''));
 
         Object.keys(this.registroForm.controls).forEach(key => {
           const control = this.registroForm.get(key);
