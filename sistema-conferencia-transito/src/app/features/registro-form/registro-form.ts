@@ -11,6 +11,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+// === Importando o SnackBar para mensagens elegantes ===
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { RegistroServico } from '../../models/registro-servico.model';
 import { CalculoHorasService } from '../../core/services/calculo-horas';
 import { RegistroService } from '../../core/services/registro';
@@ -28,7 +31,8 @@ import { RegistroService } from '../../core/services/registro';
     MatDatepickerModule,
     MatIconModule,     
     MatTooltipModule,   
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule // <-- Adicionado aos imports do componente
   ],
   templateUrl: './registro-form.html',
   styleUrl: './registro-form.scss'
@@ -40,6 +44,9 @@ export class RegistroFormComponent implements OnInit {
   private calculoService = inject(CalculoHorasService);
   private registroService = inject(RegistroService);
   private route = inject(ActivatedRoute); 
+  
+  // === Injetando o serviço de notificações ===
+  private snackBar = inject(MatSnackBar);
   
   idEdicao: string | null = null; 
 
@@ -67,6 +74,15 @@ export class RegistroFormComponent implements OnInit {
     });
   }
 
+  // === Função auxiliar para disparar os SnackBars ===
+  private mostrarNotificacao(mensagem: string) {
+    this.snackBar.open(mensagem, 'OK', {
+      duration: 4000, // Desaparece sozinho após 4 segundos
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+  }
+
   get parceiros(): FormArray {
     return this.registroForm.get('parceiros') as FormArray;
   }
@@ -81,14 +97,12 @@ export class RegistroFormComponent implements OnInit {
     }
   }
 
-  // === CARREGAMENTO PARA EDIÇÃO (CORREÇÃO DEFINITIVA) ===
   async carregarParaEdicao(id: string) {
     try {
       const todos = await this.registroService.listar();
       const registro = todos.find(r => r.id === id);
 
       if (registro) {
-        // 1. Extrai a lista de parceiros do banco com segurança
         let parceirosParaCarregar: string[] = [];
 
         if (registro.parceiros && Array.isArray(registro.parceiros) && registro.parceiros.length > 0) {
@@ -97,12 +111,10 @@ export class RegistroFormComponent implements OnInit {
           parceirosParaCarregar = (registro.parceiros as string).split(',').map(p => p.trim());
         }
 
-        // Garante que se vier vazio, tenha pelo menos um campo em branco
         if (parceirosParaCarregar.length === 0) {
           parceirosParaCarregar = ['']; 
         }
 
-        // 2. Ajusta a quantidade exata de caixinhas na tela
         while (this.parceiros.length < parceirosParaCarregar.length) {
           this.parceiros.push(this.fb.control(''));
         }
@@ -110,10 +122,8 @@ export class RegistroFormComponent implements OnInit {
           this.parceiros.removeAt(this.parceiros.length - 1);
         }
 
-        // 3. INJETA os valores na marra. Isso obriga a tela e a memória a ficarem idênticas!
         this.parceiros.patchValue(parceirosParaCarregar);
 
-        // 4. Injeta os demais dados
         this.registroForm.patchValue({
           data: new Date(registro.data),
           horaInicio: registro.horaInicio,
@@ -125,29 +135,26 @@ export class RegistroFormComponent implements OnInit {
       }
     } catch (error) {
       console.error('Erro ao carregar edição:', error);
-      alert('Não foi possível carregar os dados deste serviço.');
+      this.mostrarNotificacao('Não foi possível carregar os dados deste serviço.');
     }
   }
 
-  // === REAPROVEITAR ÚLTIMA ESCALA (CORREÇÃO DEFINITIVA) ===
   async reaproveitarUltimaEscala() {
     try {
       const todosRegistros = await this.registroService.listar();
       
       if (todosRegistros.length === 0) {
-        alert('Nenhuma escala anterior encontrada para reaproveitar.');
+        this.mostrarNotificacao('Nenhuma escala anterior encontrada para reaproveitar.');
         return;
       }
 
       const ultimo = todosRegistros[todosRegistros.length - 1];
 
-      // 1. Extrai os parceiros
       let parceirosParaCarregar: string[] = [''];
       if (ultimo.parceiros && Array.isArray(ultimo.parceiros) && ultimo.parceiros.length > 0) {
         parceirosParaCarregar = ultimo.parceiros;
       }
 
-      // 2. Ajusta a quantidade exata de caixinhas
       while (this.parceiros.length < parceirosParaCarregar.length) {
         this.parceiros.push(this.fb.control(''));
       }
@@ -155,10 +162,8 @@ export class RegistroFormComponent implements OnInit {
         this.parceiros.removeAt(this.parceiros.length - 1);
       }
 
-      // 3. Sincroniza visual e memória
       this.parceiros.patchValue(parceirosParaCarregar);
 
-      // 4. Injeta os demais dados
       this.registroForm.patchValue({
         horaInicio: ultimo.horaInicio,
         horaFim: ultimo.horaFim,
@@ -167,21 +172,25 @@ export class RegistroFormComponent implements OnInit {
         observacao: ultimo.observacao
       });
 
+      this.mostrarNotificacao('Dados da última escala preenchidos!');
+
     } catch (error) {
       console.error('Erro ao buscar última escala:', error);
-      alert('Erro ao tentar recuperar os dados da escala anterior.');
+      this.mostrarNotificacao('Erro ao tentar recuperar os dados da escala anterior.');
     }
   }
 
+  // === Suas descrições novas e atualizadas ===
   modelosDescricao = [
-    'Controlar a entrada e saída de veículos em bloqueio viário de evento',
-    'Ordenamento do trânsito e de pedestres na saída de escolares',
-    'Blitz',
-    'Realizar o patrulhamento viário por meio de motocicleta',
-    'Ordenamento do trânsito em evento',
-    'Fiscalizar os estacionamentos e impedir retenção de veículos na via',
-    'Fiscalização do estacionamento rotativo de veículos',
-    'Fiscalização por videomonitoramento'
+    'Controlar acesso e saída de veículos em bloqueios viários de eventos',
+    'Organizar o trânsito e a travessia de pedestres na saída de escolas',
+    'Realizar blitz de fiscalização de trânsito',
+    'Executar patrulhamento viário com motocicleta',
+    'Atuar como batedor em cortejos e escoltas',
+    'Organizar o trânsito em eventos',
+    'Fiscalizar estacionamentos e coibir retenções indevidas na via',
+    'Fiscalizar o estacionamento rotativo',
+    'Realizar fiscalização por videomonitoramento'
   ];
 
   preencherDescricao(modeloSelecionado: string) {
@@ -217,19 +226,16 @@ export class RegistroFormComponent implements OnInit {
       };
 
       await this.registroService.salvar(novoRegistro);
-
-      console.log('Salvo com sucesso!', novoRegistro);
       
       if (this.idEdicao) {
-        alert('Serviço atualizado com sucesso!');
+        this.mostrarNotificacao('Serviço atualizado com sucesso!');
         this.idEdicao = null;
         this.router.navigate(['/lista']); 
-      }else {
-        alert('Serviço registrado com sucesso!');
+      } else {
+        this.mostrarNotificacao('Serviço registrado com sucesso!');
         
         this.registroForm.reset({ data: new Date() });
         
-        // CORREÇÃO NO RESET DO SALVAMENTO: Limpa com segurança e deixa 1 vazia
         while (this.parceiros.length !== 0) {
           this.parceiros.removeAt(0);
         }
