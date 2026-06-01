@@ -91,6 +91,11 @@
   h2 { margin: 0; font-size: 18px; color: #333; }
 }
 
+/* NOVO: Esconde a observação de impressão enquanto o usuário usa a tela normal */
+.observacao-impressao {
+  display: none;
+}
+
 /* =========================================
    ESTILOS DE IMPRESSÃO (A4 EM DUAS COLUNAS)
    ========================================= */
@@ -180,5 +185,9 @@
       display: block !important;
       line-height: 1.0 !important;
     }
+  }
+  /* NOVO: Mostra a observação fixa apenas na hora de imprimir */
+  .observacao-impressao {
+    display: block !important;
   }
 }

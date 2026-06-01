@@ -61,7 +61,26 @@
               </p>
             </div>
           }
-        </mat-card-content>
+
+          @if (s.observacao) {
+            <div class="observacao-tela no-print" style="margin-top: 12px;">
+              <details style="cursor: pointer;">
+                <summary style="font-size: 12px; color: #3f51b5; font-weight: bold; outline: none; list-style-position: inside;">
+                  Ver observações
+                </summary>
+                <p style="margin-top: 6px; padding: 8px; background-color: #f5f5f5; border-radius: 4px; font-size: 12px; color: #555; border-left: 3px solid #3f51b5;">
+                  {{ s.observacao }}
+                </p>
+              </details>
+            </div>
+
+            <div class="observacao-impressao">
+              <p style="margin-top: 4px; font-size: 11px; font-style: italic; color: #444;">
+                <strong>Obs:</strong> {{ s.observacao }}
+              </p>
+            </div>
+          }
+          </mat-card-content>
       </mat-card>
     } @empty {
       <p class="msg-vazio">Ainda não há serviços registrados neste mês.</p>
