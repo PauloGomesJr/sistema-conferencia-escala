@@ -9,9 +9,9 @@
 .filtro-mes {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* Empurra o menu para o lado direito da tela */
+  justify-content: flex-end;
   gap: 8px;
-  margin-bottom: 16px;
+ 
   
   label {
     font-size: 13px;
@@ -26,11 +26,11 @@
     background-color: white;
     font-size: 14px;
     font-weight: bold;
-    color: #3f51b5; /* Azul padrão do seu app */
+    color: #3f51b5; 
     outline: none;
     cursor: pointer;
+    box-sizing: border-box; /* Garante que o padding não altere a altura total */
 
-    /* Efeito ao clicar no menu */
     &:focus {
       border-color: #3f51b5;
       box-shadow: 0 0 4px rgba(63, 81, 181, 0.3);
