@@ -78,7 +78,22 @@
       <!-- <mat-hint>O texto selecionado aparecerá aqui e poderá ser editado.</mat-hint>-->
     </mat-form-field>
     <!-- ==================================== -->
-
+    <div class="secao-excedente" style="background: #fff3e0; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #ffcc80;">
+      <span style="font-weight: 500; color: #e65100; display: block; margin-bottom: 12px;">
+        <mat-icon style="vertical-align: bottom; font-size: 20px; height: 20px; width: 20px;">timer</mat-icon> 
+        Tempo Excedente / Excepcional (Opcional)
+      </span>
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Início Extra</mat-label>
+          <input matInput type="time" formControlName="horaInicioExcedente">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Término Extra</mat-label>
+          <input matInput type="time" formControlName="horaFimExcedente">
+        </mat-form-field>
+      </div>
+    </div>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Observações</mat-label>
       <input matInput formControlName="observacao">

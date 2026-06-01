@@ -1,12 +1,21 @@
 <div class="container">
-  <div class="filtro-mes no-print">
-    <label for="mesRef">Mês de Referência:</label>
-    <select id="mesRef" [(ngModel)]="mesSelecionado" (change)="aoMudarMes()" class="select-mes">
-      @for (mes of mesesDisponiveis; track mes.valor) {
-        <option [value]="mes.valor">{{ mes.rotulo }}</option>
-      }
-    </select>
+
+  <div class="controles-topo no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    
+    <div class="toggle-excedente" style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: 8px; border: 1px solid #ccc;">
+      <input type="checkbox" id="toggleExtra" [(ngModel)]="somarExcedentes" (change)="calcularTotais()" style="width: 18px; height: 18px; cursor: pointer;">
+      <label for="toggleExtra" style="font-size: 13px; font-weight: bold; color: #333; cursor: pointer;">Somar Excedentes</label>
+    </div>
+
+    <div class="filtro-mes">
+      <select id="mesRef" [(ngModel)]="mesSelecionado" (change)="aoMudarMes()" class="select-mes">
+        @for (mes of mesesDisponiveis; track mes.valor) {
+          <option [value]="mes.valor">{{ mes.rotulo }}</option>
+        }
+      </select>
+    </div>
   </div>
+
   <div class="header-acoes no-print">
     <h2>Fechamento de Escala</h2>
     <button mat-icon-button color="primary" (click)="imprimirCupom()">
@@ -27,15 +36,12 @@
 
   <div class="lista-items">
    @for (s of servicos; track s.id) {
-      <!-- Adicionamos position: relative ao card para segurar o botão -->
-      <mat-card class="item-card" style="position: relative;">
+      <mat-card class="item-card" style="position: relative;" [class.card-com-excedente]="s.totalHorasExcedentes && s.totalHorasExcedentes > 0">
         
-        <!-- NOVO: Botão flutuando no canto superior direito -->
-        <button mat-icon-button color="primary" (click)="editarServico(s.id!)" style="position: absolute; top: 8px; right: 8px; z-index: 1;">
+        <button mat-icon-button color="primary" (click)="editarServico(s.id!)" style="position: absolute; top: 8px; right: 8px; z-index: 1;" class="no-print">
           <mat-icon>edit</mat-icon>
         </button>
 
-        <!-- Header limpo, usando o padrão nativo do Angular Material -->
         <mat-card-header>
           <mat-card-title>{{ s.codigoServico }}</mat-card-title>
           <mat-card-subtitle>{{ s.data | date:'dd/MM/yyyy' }} | {{ s.horaInicio }} - {{ s.horaFim }}</mat-card-subtitle>
@@ -44,12 +50,21 @@
         <mat-card-content style="margin-top: 8px;">
           <p>{{ s.descricao }}</p>
           @if (s.parceiros && s.parceiros.length > 0) {
-            <small>🤝 {{ s.parceiros.join(', ') }}</small>
+            <small style="margin-bottom: 8px;">🤝 {{ s.parceiros.join(', ') }}</small>
+          }
+
+          @if (s.totalHorasExcedentes && s.totalHorasExcedentes > 0) {
+            <div class="linha-excedente-print" style="margin-top: 8px; padding: 6px; background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 4px;">
+              <strong style="color: #e65100; font-size: 12px;">↳ TEMPO EXCEDENTE (Excepcional)</strong>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #d84315;">
+                {{ s.horaInicioExcedente }} às {{ s.horaFimExcedente }} (+{{ s.totalHorasExcedentes | number:'1.1-2' }}h)
+              </p>
+            </div>
           }
         </mat-card-content>
       </mat-card>
     } @empty {
-      <p class="msg-vazio">Ainda não há serviços registrados.</p>
+      <p class="msg-vazio">Ainda não há serviços registrados neste mês.</p>
     }
   </div>
 </div>

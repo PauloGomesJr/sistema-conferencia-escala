@@ -31,6 +31,9 @@ export class RegistroListaComponent implements OnInit {
   mesSelecionado: string = '';
   mesesDisponiveis: { valor: string, rotulo: string }[] = [];
 
+  // === NOVO: A chave que controla se as horas extras entram no totalizador ===
+  somarExcedentes = false;
+
   ngOnInit() {
     this.gerarMesesDisponiveis();
     this.carregarDados();
@@ -69,13 +72,31 @@ export class RegistroListaComponent implements OnInit {
         return dataB - dataA; 
       });
 
-      this.totalHorasMes = this.servicos.reduce((acc, curr) => acc + (curr.totalHoras || 0), 0);
-      this.totalAdicionalNoturno = this.servicos.reduce((acc, curr) => acc + (curr.adicionalNoturno || 0), 0);
+      //this.totalHorasMes = this.servicos.reduce((acc, curr) => acc + (curr.totalHoras || 0), 0);
+      //this.totalAdicionalNoturno = this.servicos.reduce((acc, curr) => acc + (curr.adicionalNoturno || 0), 0);
       
+      // NOVO: Chamamos a função de cálculo em vez de somar direto aqui
+      this.calcularTotais();
+
       this.cdr.detectChanges();
     } catch (erro) {
       console.error('ERRO GRAVE ao listar dados:', erro);
     }
+  }
+  
+  // === NOVO: Calcula dinamicamente respeitando a decisão do agente ===
+  calcularTotais() {
+    this.totalHorasMes = this.servicos.reduce((acc, curr) => {
+      let base = curr.totalHoras || 0;
+      let extra = (this.somarExcedentes && curr.totalHorasExcedentes) ? curr.totalHorasExcedentes : 0;
+      return acc + base + extra;
+    }, 0);
+
+    this.totalAdicionalNoturno = this.servicos.reduce((acc, curr) => {
+      let base = curr.adicionalNoturno || 0;
+      let extra = (this.somarExcedentes && curr.adicionalNoturnoExcedente) ? curr.adicionalNoturnoExcedente : 0;
+      return acc + base + extra;
+    }, 0);
   }
 
   // === NOVO: Recarrega a lista quando o agente muda o mês no menu ===

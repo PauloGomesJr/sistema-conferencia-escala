@@ -10,4 +10,10 @@ export interface RegistroServico {
   totalHoras?: number;
   adicionalNoturno?: number;
   mesAno?: string; // NOVO: Campo para agrupar e buscar as escalas do mês facilmente
+
+  // === NOVOS CAMPOS: Tempo Excedente / Excepcional ===
+  horaInicioExcedente?: string;
+  horaFimExcedente?: string;
+  totalHorasExcedentes?: number;
+  adicionalNoturnoExcedente?: number;
 }

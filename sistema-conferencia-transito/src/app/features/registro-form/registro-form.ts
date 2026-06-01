@@ -61,7 +61,9 @@ export class RegistroFormComponent implements OnInit {
       this.fb.control('') 
     ]),
     descricao: ['', Validators.required],
-    observacao: ['']
+    observacao: [''],
+    horaInicioExcedente: [''],
+    horaFimExcedente: ['']
   });
 
   ngOnInit() {
@@ -130,7 +132,10 @@ export class RegistroFormComponent implements OnInit {
           horaFim: registro.horaFim,
           codigoServico: registro.codigoServico,
           descricao: registro.descricao,
-          observacao: registro.observacao
+          observacao: registro.observacao,
+          // Carrega os dados excedentes se existirem
+          horaInicioExcedente: registro.horaInicioExcedente || '',
+          horaFimExcedente: registro.horaFimExcedente || ''
         });
       }
     } catch (error) {
@@ -169,7 +174,10 @@ export class RegistroFormComponent implements OnInit {
         horaFim: ultimo.horaFim,
         codigoServico: ultimo.codigoServico,
         descricao: ultimo.descricao,
-        observacao: ultimo.observacao
+        observacao: ultimo.observacao,
+        // Força a limpeza das horas excedentes, pois são excepcionais!
+        horaInicioExcedente: '',
+        horaFimExcedente: ''
       });
 
       this.mostrarNotificacao('Dados da última escala preenchidos!');
@@ -190,7 +198,8 @@ export class RegistroFormComponent implements OnInit {
     'Organizar o trânsito em eventos',
     'Fiscalizar estacionamentos e coibir retenções indevidas na via',
     'Fiscalizar o estacionamento rotativo',
-    'Realizar fiscalização por videomonitoramento'
+    'Realizar fiscalização por videomonitoramento',
+    'Atendimento à usuários - setor de Trânsito/Transporte '
   ];
 
   preencherDescricao(modeloSelecionado: string) {
@@ -208,6 +217,15 @@ export class RegistroFormComponent implements OnInit {
         val.data!, val.horaInicio!, val.horaFim!
       );
 
+      // === CÁLCULO DAS HORAS EXCEDENTES (Usando a mesma inteligência do seu service) ===
+      let horasExcedentes = 0;
+      let adicionalNoturnoExcedente = 0;
+
+      if (val.horaInicioExcedente && val.horaFimExcedente) {
+        horasExcedentes = this.calculoService.calcularTotalHoras(val.data!, val.horaInicioExcedente, val.horaFimExcedente);
+        adicionalNoturnoExcedente = this.calculoService.calcularAdicionalNoturno(val.data!, val.horaInicioExcedente, val.horaFimExcedente);
+      }
+
       const listaParceiros = (val.parceiros as string[])
         .map(p => p ? p.trim() : '')
         .filter(p => p !== ''); 
@@ -222,7 +240,12 @@ export class RegistroFormComponent implements OnInit {
         observacao: val.observacao || '',
         parceiros: listaParceiros,
         totalHoras: horasTotais,
-        adicionalNoturno: horasNoturnas
+        adicionalNoturno: horasNoturnas,
+        // === SALVANDO OS NOVOS DADOS ===
+        horaInicioExcedente: val.horaInicioExcedente || undefined,
+        horaFimExcedente: val.horaFimExcedente || undefined,
+        totalHorasExcedentes: horasExcedentes,
+        adicionalNoturnoExcedente: adicionalNoturnoExcedente
       };
 
       await this.registroService.salvar(novoRegistro);
