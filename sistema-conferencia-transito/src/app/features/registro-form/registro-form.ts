@@ -199,7 +199,7 @@ export class RegistroFormComponent implements OnInit {
     'Fiscalizar estacionamentos e coibir retenções indevidas na via',
     'Fiscalizar o estacionamento rotativo',
     'Realizar fiscalização por videomonitoramento',
-    'Atendimento à usuários - setor de Trânsito/Transporte '
+    'Atendimento a usuários - setor de Trânsito/Transporte'
   ];
 
   preencherDescricao(modeloSelecionado: string) {
